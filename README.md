@@ -1,8 +1,7 @@
-Text-To-Video AI
+Text-To-Video AI (Tanpa OpenAI)
 
 
 
-(Tanpa OpenAI)
 
 Buat video dari naskah/storyboard tanpa OpenAI.
 
@@ -85,14 +84,6 @@ Klik Generate Video
 Video final akan muncul langsung di browser
 
 
-Contoh GUI Streamlit:
-
-
-
-Contoh hasil video:
-
-<video src="docs/example_video.mp4" controls width="480"></video>
-
 
 ---
 
@@ -116,14 +107,16 @@ Text-To-Video-NoOpenAI/
 ├── main_streamlit.py
 ├── naskah.txt
 ├── requirements.txt
-├── docs/                       # Screenshot & contoh video
-│   ├── screenshot_gui.png
-│   └── example_video.mp4
 └── utility/
     ├── audio/
+    │   └── audio_generator.py
     ├── captions/
+    │   └── timed_captions_generator.py
     ├── video/
+    │   ├── background_video_generator.py
+    │   └── video_search_query_generator.py
     └── render/
+        └── render_engine.py
 
 
 ---
@@ -134,4 +127,8 @@ Semua rendering terjadi di lokal
 
 Background video diambil dari Pexels
 
-Tidak ada OpenAI, semua naskah bisa input manual
+Tidak ada OpenAI API, semua naskah bisa input manual
+
+
+
+---
