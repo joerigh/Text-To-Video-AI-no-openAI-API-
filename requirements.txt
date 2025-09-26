@@ -48,3 +48,28 @@ urllib3==2.2.1
 whisper-timestamped==1.15.4
 yarl==1.9.4
 groq==0.11.0
+# Text-to-Speech
+edge-tts==1.2.0          # Generate audio dari teks
+
+# Timed captions
+whisper-timestamped==1.0.4  # Membuat captions beserta timestamp dari audio
+torch>=2.0.0                 # Backend untuk whisper
+torchaudio>=2.0.2            # Audio processing untuk whisper
+
+# Download video & request API
+requests==2.31.0          # Untuk panggil API Pexels dan download video
+tqdm==4.66.1              # Optional: progress bar saat download video
+
+# Video rendering
+moviepy==2.0.0.dev10      # Render video akhir
+numpy==1.26.0             # Dibutuhkan MoviePy
+pillow==10.1.0            # Manipulasi gambar/video & TextClip
+
+# GUI (opsional)
+streamlit==1.25.0         # Jika ingin pakai Streamlit GUI
+
+# Catatan tambahan:
+# 1. ImageMagick harus terinstall di sistem untuk TextClip:
+#    - Linux: sudo apt install imagemagick
+#    - Windows: download installer ImageMagick
+# 2. Semua library lain bisa diinstall via: pip install -r requirements.txt
