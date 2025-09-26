@@ -1,17 +1,11 @@
 Text-To-Video AI
 
 
+---
+
 Tanpa OpenAI API
 
-Buat video dari naskah/storyboard tanpa OpenAI.
-
-Audio: edge-tts
-
-Timed captions: whisper-timestamped
-
-Background video: Pexels
-
-Render video: MoviePy
+Naskah dibuat sendiri tanpa otomatis oleh openAI
 
 Bisa dijalankan via Terminal atau Streamlit GUI
 
