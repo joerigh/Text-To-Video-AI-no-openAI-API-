@@ -1,7 +1,7 @@
-Text-To-Video AI (Tanpa OpenAI)
+Text-To-Video AI
 
 
-
+Tanpa OpenAI API
 
 Buat video dari naskah/storyboard tanpa OpenAI.
 
