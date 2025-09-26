@@ -1,68 +1,137 @@
-# Text To Video AI 🔥
+Text-To-Video AI
 
-Generate video from text using AI
 
-If you wish to add Text to Video into your application, here is an api to create video from text :- https://docs.vadoo.tv/docs/guide/create-an-ai-video
 
-### Youtube Tutorial -> https://www.youtube.com/watch?v=AXo6VfRUgic
+(Tanpa OpenAI)
 
-### Medium tutorial -> https://medium.com/@anilmatcha/text-to-video-ai-how-to-create-videos-for-free-a-complete-guide-a25c91de50b8
+Buat video dari naskah/storyboard tanpa OpenAI.
 
-### Demo Video
+Audio: edge-tts
 
-https://github.com/user-attachments/assets/1e440ace-8560-4e12-850e-c532740711e7
+Timed captions: whisper-timestamped
 
-### 🌟 Show Support
+Background video: Pexels
 
-If you enjoy using Text to Video AI, we'd appreciate your support with a star ⭐ on our repository. Your encouragement is invaluable and inspires us to continually improve and expand Text to Video AI. Thank you, and happy content creation! 🎉
+Render video: MoviePy
 
-[![GitHub star chart](https://img.shields.io/github/stars/SamurAIGPT/Text-To-Video-AI?style=social)](https://github.com/SamurAIGPT/Text-To-Video-AI/stargazers)
+Bisa dijalankan via Terminal atau Streamlit GUI
 
-### Steps to run
 
-Run the following steps
 
-```
-export OPENAI_KEY="api-key"
-export PEXELS_KEY="pexels-key"
+---
 
-pip install -r requirements.text
+🔹 Fitur Utama
 
-python app.py "Topic name"
-```
+Input naskah manual atau dari file .txt
 
-Output will be generated in rendered_video.mp4
+Generate audio TTS dari naskah
 
-### Quick Start
+Generate timed captions otomatis
 
-Without going through the installation hastle here is a simple way to generate videos from text
+Cari dan gunakan background video dari Pexels
 
-For a simple way to run the code, checkout the [colab link](/Text_to_Video_example.ipynb)
+Render video final (rendered_video.mp4) di lokal
 
-To generate a video, just click on all the cells one by one. Setup your api keys for openai and pexels
 
-## 💁 Contribution
 
-As an open-source project we are extremely open to contributions. To get started raise an issue in Github or create a pull request
+---
 
-### Other useful Video AI Projects
+💻 Instalasi
 
-[AI Influencer generator](https://github.com/SamurAIGPT/AI-Influencer-Generator)
+1. Clone repositori:
 
-[AI Youtube Shorts generator](https://github.com/SamurAIGPT/AI-Youtube-Shorts-Generator/)
 
-[Faceless Video Generator](https://github.com/SamurAIGPT/Faceless-Video-Generator)
 
-[AI B-roll generator](https://github.com/Anil-matcha/AI-B-roll)
+git clone <repo-url>
+cd Text-To-Video-NoOpenAI
 
-[AI video generator](https://www.vadoo.tv/ai-video-generator)
+2. Install dependencies:
 
-[Text to Video AI](https://www.vadoo.tv/text-to-video-ai)
 
-[Autoshorts AI](https://www.vadoo.tv/autoshorts-ai)
 
-[Pixverse alternative](https://www.vadoo.tv/pixverse-ai)
+pip install -r requirements.txt
 
-[Hailuo AI alternative](https://www.vadoo.tv/hailuo-ai)
+3. Install ImageMagick agar TextClip MoviePy berjalan:
 
-[Minimax AI alternative](https://www.vadoo.tv/minimax-ai)
+
+
+Linux: sudo apt install imagemagick
+
+Windows: download installer ImageMagick
+
+
+
+---
+
+🚀 Cara Pakai
+
+1. Terminal / Command Line
+
+python main.py
+
+Pilih input naskah: file naskah.txt atau manual
+
+Video final akan tersimpan sebagai rendered_video.mp4
+
+
+2. Streamlit GUI
+
+streamlit run main_streamlit.py
+
+Masukkan naskah di text area
+
+Klik Generate Video
+
+Video final akan muncul langsung di browser
+
+
+Contoh GUI Streamlit:
+
+
+
+Contoh hasil video:
+
+<video src="docs/example_video.mp4" controls width="480"></video>
+
+
+---
+
+⚙️ Konfigurasi
+
+Pexels API Key: masukkan di main.py
+
+
+PEXELS_API_KEY = "YOUR_PEXELS_API_KEY"
+
+File naskah opsional: naskah.txt
+
+
+
+---
+
+📂 Struktur Folder
+
+Text-To-Video-NoOpenAI/
+├── main.py
+├── main_streamlit.py
+├── naskah.txt
+├── requirements.txt
+├── docs/                       # Screenshot & contoh video
+│   ├── screenshot_gui.png
+│   └── example_video.mp4
+└── utility/
+    ├── audio/
+    ├── captions/
+    ├── video/
+    └── render/
+
+
+---
+
+⚠️ Catatan
+
+Semua rendering terjadi di lokal
+
+Background video diambil dari Pexels
+
+Tidak ada OpenAI, semua naskah bisa input manual
