@@ -21,14 +21,12 @@ def main():
     print("=== [2] Generate Timed Captions ===")
     timed_captions = generate_timed_captions(AUDIO_FILE)
 
-    print("=== [3] Generate Search Queries ===")
-    search_terms = getVideoSearchQueriesTimed(user_text, timed_captions)
+    print("=== [3] Translate & Generate Pexels Queries ===")
+    search_queries = getVideoSearchQueriesTimed(timed_captions)
+    video_segments = [generate_video_url(q) or generate_video_url("nature") for q in search_queries]
+    print("Video segments:", video_segments)
 
-    print("=== [4] Ambil Video dari Pexels ===")
-    video_segments = generate_video_url(search_terms, "pexels")
-    print("Background video URLs:", video_segments)
-
-    print("=== [5] Render Final Video ===")
+    print("=== [4] Merge Audio + Video + Captions ===")
     final_path = get_output_media(AUDIO_FILE, timed_captions, video_segments, "pexels", VIDEO_FILE)
     print(f"Video selesai dibuat: {final_path}")
 
