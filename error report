@@ -1,4 +1,13 @@
-ModuleNotFoundError: No module named 'utility.audio.tts'
-Traceback:
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 8, in <module>
-    from utility.audio.tts import generate_audio
+2025-09-27 15:22:07.069 Uncaught app execution
+Traceback (most recent call last):
+  File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 128, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 669, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 30, in <module>
+    search_terms = getVideoSearchQueriesTimed(user_text, timed_captions)
+  File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\video\video_search.py", line 16, in getVideoSearchQueriesTimed
+    for _, text in timed_captions:
+        ^^^^^^^
+ValueError: too many values to unpack (expected 2)
