@@ -1,11 +1,18 @@
 import os
 import requests
+from dotenv import load_dotenv
+
+# load .env file
+load_dotenv()
 
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
 if not PEXELS_API_KEY:
-    raise ValueError("PEXELS_API_KEY belum diset. Silakan set environment variable atau buat file .env")
+    raise ValueError("PEXELS_API_KEY belum diset. Silakan isi file .env di root project")
 
 def generate_video_url(search_terms, per_page=3):
+    """
+    Ambil video dari Pexels berdasarkan kata kunci (search_terms)
+    """
     video_urls = []
     headers = {"Authorization": PEXELS_API_KEY}
 
@@ -25,4 +32,7 @@ def generate_video_url(search_terms, per_page=3):
         print("Tidak ada video yang ditemukan di Pexels.")
         return None
 
+    return video_urls
+
+def merge_empty_intervals(video_urls):
     return video_urls
