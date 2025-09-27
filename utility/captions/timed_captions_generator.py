@@ -1,8 +1,11 @@
+# utils/timed_caption_generator.py
+
 class Caption:
     def __init__(self, start, end, text):
         self.start = start
         self.end = end
         self.text = text
+
 
 def normalize_captions(captions):
     """
@@ -21,9 +24,10 @@ def normalize_captions(captions):
             normalized.append(cap)
     return normalized
 
+
 def generate_timed_captions(captions):
     """
-    Contoh fungsi utama untuk mengenerate caption dengan timing.
+    Generate teks caption dengan timing.
     captions bisa berupa list of dict atau list of Caption object.
     """
     captions = normalize_captions(captions)
@@ -36,12 +40,26 @@ def generate_timed_captions(captions):
     return "\n".join(output)
 
 
-# -----------------------------
-# Contoh penggunaan
-if __name__ == "__main__":
-    sample_captions = [
-        {"start": 0.0, "end": 2.0, "text": "Halo dunia"},
-        {"start": 2.1, "end": 4.0, "text": "Ini teks kedua"},
-    ]
+def text_to_captions(text: str, step: float = 2.0):
+    """
+    Ubah input teks mentah (string) menjadi list of dict caption.
+    step = durasi per baris (default 2 detik).
+    """
+    lines = text.split("\n")
+    captions = []
+    for i, line in enumerate(lines):
+        if line.strip():
+            captions.append({
+                "start": i * step,
+                "end": (i + 1) * step,
+                "text": line.strip()
+            })
+    return captions
 
-    print(generate_timed_captions(sample_captions))
+
+# -----------------------------
+# Tes mandiri
+if __name__ == "__main__":
+    sample_text = "Halo dunia\nIni teks kedua\nBaris ketiga"
+    caps = text_to_captions(sample_text, step=2.0)
+    print(generate_timed_captions(caps))
