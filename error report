@@ -1,14 +1,49 @@
-Audio berhasil dibuat: audio_tts.wav
-2025-09-27 12:50:19.531 Uncaught app execution
+2025-09-27 13:11:58.193 Uncaught app execution
+Traceback (most recent call last):
+  File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\moviepy\video\VideoClip.py", line 1137, in __init__
+    subprocess_call(cmd, logger=None)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\moviepy\tools.py", line 46, in subprocess_call
+    proc = sp.Popen(cmd, **popen_params)
+  File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 1554, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                             # no special security
+                             ^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                             cwd,
+                             ^^^^
+                             startupinfo)
+                             ^^^^^^^^^^^^
+FileNotFoundError: [WinError 2] The system cannot find the file specified
+
+During handling of the above exception, another exception occurred:
+
 Traceback (most recent call last):
   File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 128, in exec_func_with_error_handling
     result = func()
   File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 669, in code_to_exec
     exec(code, module.__dict__)  # noqa: S102
     ~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 34, in <module>
-    timed_captions = generate_timed_captions(SAMPLE_FILE_NAME)
-  File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\captions\timed_captions_generator.py", line 34, in generate_timed_captions
-    line = f"[{cap.start:.2f} - {cap.end:.2f}] {cap.text}"
-               ^^^^^^^^^
-AttributeError: 'str' object has no attribute 'start'
+  File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 82, in <module>
+    captions_text = render_video(user_text, AUDIO_FILE, VIDEO_FILE, step=2.0)
+  File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 51, in render_video
+    txt_clip = (TextClip(cap["text"], fontsize=40, color="white", size=(1200, None), method="caption")
+                ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\moviepy\video\VideoClip.py", line 1146, in __init__
+    raise IOError(error)
+OSError: MoviePy Error: creation of None failed because of the following error:
+
+[WinError 2] The system cannot find the file specified.
+
+.This error can be due to the fact that ImageMagick is not installed on your computer, or (for Windows users) that you didn't specify the path to the ImageMagick binary in file conf.py, or that the path you specified is incorrect
