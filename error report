@@ -1,6 +1,20 @@
-RuntimeError: Tidak ada video yang berhasil diambil.
+ModuleNotFoundError: No module named 'cgi'
 Traceback:
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 34, in <module>
-    final_path = get_output_media(AUDIO_FILE, timed_captions, video_segments, "pexels", VIDEO_FILE)
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\video\video_merge.py", line 21, in get_output_media
-    raise RuntimeError("Tidak ada video yang berhasil diambil.")
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 6, in <module>
+    from utility.video.video_search import getVideoSearchQueriesTimed, generate_video_url
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\video\video_search.py", line 4, in <module>
+    from googletrans import Translator
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\googletrans\__init__.py", line 6, in <module>
+    from googletrans.client import Translator
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\googletrans\client.py", line 13, in <module>
+    import httpx
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\__init__.py", line 2, in <module>
+    from ._api import delete, get, head, options, patch, post, put, request, stream
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_api.py", line 3, in <module>
+    from ._client import Client, StreamContextManager
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 8, in <module>
+    from ._auth import Auth, BasicAuth, FunctionAuth
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_auth.py", line 10, in <module>
+    from ._models import Request, Response
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py", line 1, in <module>
+    import cgi
