@@ -1,50 +1,6 @@
-import sys
-import subprocess
-import importlib.util
-
-def install_package(package):
-    """Install package via pip."""
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", package])
-
-def check_module(module_name):
-    """Check if module can be imported."""
-    spec = importlib.util.find_spec(module_name)
-    return spec is not None
-
-def install_ffmpeg():
-    """Install ffmpeg if on Termux/Linux."""
-    import platform, os
-    system = platform.system()
-    if system == "Linux":
-        if os.path.exists("/data/data/com.termux/files/usr/bin/pkg"):
-            # Termux
-            subprocess.call(["pkg", "install", "-y", "ffmpeg"])
-        else:
-            # Debian/Ubuntu
-            subprocess.call(["sudo", "apt", "update"])
-            subprocess.call(["sudo", "apt", "install", "-y", "ffmpeg"])
-    elif system == "Darwin":
-        # MacOS (brew)
-        subprocess.call(["brew", "install", "ffmpeg"])
-    else:
-        print("Pastikan ffmpeg sudah terinstall secara manual di Windows.")
-
-def main():
-    print("=== Install/Upgrade pip ===")
-    install_package("pip")
-
-    print("=== Install MoviePy ===")
-    install_package("moviepy")
-
-    print("=== Install ffmpeg jika perlu ===")
-    install_ffmpeg()
-
-    print("=== Cek import moviepy.editor ===")
-    try:
-        import moviepy.editor as mpy
-        print("✅ MoviePy OK! moviepy.editor sudah bisa diimport.")
-    except ModuleNotFoundError:
-        print("❌ Masih error: moviepy.editor tidak ditemukan!")
-
-if __name__ == "__main__":
-    main()
+ModuleNotFoundError: No module named 'moviepy.editor'
+Traceback:
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 7, in <module>
+    from utility.render.render_engine import get_output_media
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\render\render_engine.py", line 4, in <module>
+    from moviepy.editor import AudioFileClip, CompositeVideoClip, CompositeAudioClip, VideoFileClip, TextClip
