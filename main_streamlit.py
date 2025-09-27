@@ -6,16 +6,10 @@ from utility.video.background_video_generator import generate_video_url
 from utility.video.video_search_query_generator import getVideoSearchQueriesTimed, merge_empty_intervals
 from utility.render.render_engine import get_output_media
 
-# ===========================
-# Konfigurasi
-# ===========================
 SAMPLE_FILE_NAME = "audio_tts.wav"
 VIDEO_SERVER = "pexel"
-PEXELS_API_KEY = "DLzD281196wa1jxs3Fq2yVITUnt9NPTV3FUcpykXqBv1p9tzOLRMnIqH"
+PEXELS_API_KEY = "YOUR_PEXELS_API_KEY"
 
-# ===========================
-# Streamlit GUI
-# ===========================
 st.title("Text-To-Video AI (Tanpa OpenAI)")
 st.write("Masukkan naskah/video storyboard di bawah ini:")
 
