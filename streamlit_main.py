@@ -1,5 +1,4 @@
 import streamlit as st
-import os
 from utility.audio.tts import generate_audio
 from utility.captions.whisper_caption import generate_timed_captions
 from utility.video.video_search import getVideoSearchQueriesTimed, generate_video_url
@@ -22,9 +21,9 @@ if st.button("Generate Video"):
         with st.spinner("📝 Membuat captions..."):
             timed_captions = generate_timed_captions(AUDIO_FILE)
 
-        with st.spinner("🔍 Cari video di Pexels..."):
-            search_terms = getVideoSearchQueriesTimed(user_text, timed_captions)
-            video_segments = generate_video_url(search_terms, "pexels")
+        with st.spinner("🔍 Translate & Ambil video dari Pexels..."):
+            search_queries = getVideoSearchQueriesTimed(timed_captions)
+            video_segments = [generate_video_url(q) or generate_video_url("nature") for q in search_queries]
 
         st.text("Background video URLs:")
         st.write(video_segments)
