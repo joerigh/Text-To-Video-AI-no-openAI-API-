@@ -1,34 +1,37 @@
 import os
-from dotenv import load_dotenv
-from utility.captions.timed_captions_generator import generate_timed_captions
+from utility.audio.tts import generate_audio
+from utility.captions.whisper_caption import generate_timed_captions
 from utility.video.video_search import getVideoSearchQueriesTimed, generate_video_url
 from utility.video.video_merge import get_output_media
-from utility.audio.tts import generate_audio
-
-load_dotenv()
 
 AUDIO_FILE = "audio_tts.wav"
-VIDEO_FILE = "final_output.mp4"
+VIDEO_FILE = "final_video.mp4"
 
-if __name__ == "__main__":
-    # Ambil naskah dari file
+def main():
+    # Input manual atau dari file naskah.txt
     if os.path.exists("naskah.txt"):
         with open("naskah.txt", "r", encoding="utf-8") as f:
-            script = f.read().strip()
+            user_text = f.read().strip()
     else:
-        script = input("Masukkan teks untuk video: ")
+        user_text = input("Masukkan teks naskah video: ").strip()
 
-    print("🔊 Generate audio...")
-    generate_audio(script, AUDIO_FILE)
+    print("=== [1] Generate Audio ===")
+    generate_audio(user_text, AUDIO_FILE)
 
-    print("📜 Generate timed captions...")
+    print("=== [2] Generate Timed Captions ===")
     timed_captions = generate_timed_captions(AUDIO_FILE)
 
-    print("🔎 Cari video dari Pexels...")
-    search_terms = getVideoSearchQueriesTimed(script, timed_captions)
-    background_video_files = generate_video_url(search_terms, "pexel")
+    print("=== [3] Generate Search Queries ===")
+    search_terms = getVideoSearchQueriesTimed(user_text, timed_captions)
 
-    print("🎬 Render video...")
-    captions_text = get_output_media(AUDIO_FILE, timed_captions, background_video_files, "pexel")
+    print("=== [4] Ambil Video dari Pexels ===")
+    video_segments = generate_video_url(search_terms, "pexels")
+    print("Background video URLs:", video_segments)
 
-    print(f"✅ Video final tersimpan di {VIDEO_FILE}")
+    print("=== [5] Render Final Video ===")
+    final_path = get_output_media(AUDIO_FILE, timed_captions, video_segments, "pexels", VIDEO_FILE)
+    print(f"Video selesai dibuat: {final_path}")
+
+
+if __name__ == "__main__":
+    main()
