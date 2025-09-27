@@ -6,11 +6,7 @@ if not PEXELS_API_KEY:
     raise ValueError("PEXELS_API_KEY belum diset. Silakan set environment variable atau buat file .env")
 
 def generate_video_url(search_terms, per_page=3):
-    """
-    Ambil video dari Pexels berdasarkan daftar kata kunci (search_terms)
-    """
     video_urls = []
-
     headers = {"Authorization": PEXELS_API_KEY}
 
     for term in search_terms:
@@ -20,7 +16,6 @@ def generate_video_url(search_terms, per_page=3):
         if response.status_code == 200:
             data = response.json()
             for video in data.get("videos", []):
-                # ambil video file resolusi tertinggi
                 video_file = max(video["video_files"], key=lambda x: x.get("width", 0))
                 video_urls.append(video_file["link"])
         else:
@@ -30,10 +25,4 @@ def generate_video_url(search_terms, per_page=3):
         print("Tidak ada video yang ditemukan di Pexels.")
         return None
 
-    return video_urls
-
-def merge_empty_intervals(video_urls):
-    """
-    Stub sederhana: langsung return input
-    """
     return video_urls
