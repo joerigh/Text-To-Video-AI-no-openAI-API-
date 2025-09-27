@@ -1,9 +1,4 @@
-Menggabungkan video + audio...
-
-RuntimeError: Tidak ada video yang berhasil digabung
+SyntaxError: File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\video\video_search.py", line 2 import os import requests from deep_translator import GoogleTranslator ^ SyntaxError: invalid syntax
 Traceback:
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 37, in <module>
-    get_output_media(AUDIO_FILE, video_files, VIDEO_FILE)
-    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\video\video_merge.py", line 19, in get_output_media
-    raise RuntimeError("Tidak ada video yang berhasil digabung")
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 6, in <module>
+    from utility.video.video_search import getVideoSearchQueriesTimed, download_video_from_pexels
