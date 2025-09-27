@@ -1,31 +1,65 @@
-# video_search_query_generator.py (deep-translator version)
+import os
 from deep_translator import GoogleTranslator
-from utility.utils import log_response, LOG_TYPE_SCRIPT
+from utility.utils import log_response, LOG_TYPE_GPT
 import re
-from collections import Counter
 
-def getVideoSearchQueriesTimed_manual(script, captions_timed, keywords_manual=None):
-    timed_keywords = []
-    for i, ((t1, t2), caption_text) in enumerate(captions_timed):
-        if keywords_manual and i < len(keywords_manual):
-            kws = keywords_manual[i]
+PEXELS_API_KEY = os.environ.get('PEXELS_KEY')
+
+# List stopwords sederhana (extendable)
+STOPWORDS = set([
+    "di", "dan", "yang", "dari", "ke", "pada", "untuk", "the", "a", "an", "of", "in", "on", "with", "is"
+])
+
+def clean_word(word):
+    return re.sub(r'[^\w\s]', '', word.lower())
+
+def extract_keywords(sentence, lang='en'):
+    """
+    Ambil kata penting dan gabungkan menjadi keyword visual (1-2 kata per keyword)
+    """
+    words = [clean_word(w) for w in sentence.split() if clean_word(w) and clean_word(w) not in STOPWORDS]
+
+    keywords = []
+    i = 0
+    while i < len(words):
+        if i + 1 < len(words):
+            keywords.append(f"{words[i]} {words[i+1]}")
+            i += 2
         else:
-            kws = extract_keywords_from_text(caption_text)
-        kws_en = [translate_to_english(kw) for kw in kws]
-        timed_keywords.append([[t1, t2], kws_en])
-    log_response(LOG_TYPE_SCRIPT, script, timed_keywords)
-    return timed_keywords
+            keywords.append(words[i])
+            i += 1
 
-def extract_keywords_from_text(text, top_n=5):
-    words = re.findall(r'\b\w+\b', text.lower())
-    stopwords = set(["the","and","is","are","a","of","to","in","for","with","that","on","as","by","at"])
-    words = [w for w in words if w not in stopwords]
-    counts = Counter(words)
-    keywords = [w for w,_ in counts.most_common(top_n)]
+    # Jika bahasa bukan Inggris, translate ke Inggris
+    if lang != 'en':
+        translated = []
+        for kw in keywords:
+            try:
+                t = GoogleTranslator(source='auto', target='en').translate(kw)
+                translated.append(t)
+            except:
+                translated.append(kw)
+        keywords = translated
+
     return keywords
 
-def translate_to_english(word):
+def getVideoSearchQueriesTimed_manual(script, timed_captions, manual_keywords=[]):
+    """
+    Generate keywords per caption segment, auto detect language
+    manual_keywords optional override
+    """
+    result = []
+    lang_code = 'en'
     try:
-        return GoogleTranslator(source='auto', target='en').translate(word)
+        from langdetect import detect
+        lang_code = detect(script)
     except:
-        return word
+        lang_code = 'en'
+
+    for idx, ((t1, t2), caption) in enumerate(timed_captions):
+        if manual_keywords and idx < len(manual_keywords):
+            kws = manual_keywords[idx]
+        else:
+            kws = extract_keywords(caption, lang=lang_code)
+        result.append([[t1, t2], kws])
+
+    return result
