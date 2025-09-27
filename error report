@@ -1,4 +1,6 @@
-ModuleNotFoundError: No module named 'utility.captions.whisper_caption'
+RuntimeError: Tidak ada video yang berhasil diambil.
 Traceback:
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 5, in <module>
-    from utility.captions.whisper_caption import generate_timed_captions
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 34, in <module>
+    final_path = get_output_media(AUDIO_FILE, timed_captions, video_segments, "pexels", VIDEO_FILE)
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\video\video_merge.py", line 21, in get_output_media
+    raise RuntimeError("Tidak ada video yang berhasil diambil.")
