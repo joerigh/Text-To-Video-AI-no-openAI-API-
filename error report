@@ -1,6 +1,6 @@
-ModuleNotFoundError: No module named 'utility.audio.text_to_speech'
+ModuleNotFoundError: No module named 'openai'
 Traceback:
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 3, in <module>
-    from main import VIDEO_OUTPUT, AUDIO_FILE, VIDEO_FOLDER, timed_captions
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\main.py", line 5, in <module>
-    from utility.audio.text_to_speech import generate_tts
+File "C:\Users\digitalFORENSIK\Downloads\Compressed\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\app.py", line 6, in <module>
+    from utility.video.video_search_query_generator import getVideoSearchQueriesTimed, merge_empty_intervals
+File "C:\Users\digitalFORENSIK\Downloads\Compressed\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\video\video_search_query_generator.py", line 1, in <module>
+    from openai import OpenAI
