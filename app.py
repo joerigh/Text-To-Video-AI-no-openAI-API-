@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import tempfile
 import asyncio
@@ -10,7 +9,7 @@ from utility.audio.audio_generator import generate_audio
 # Caption generator
 from utility.captions.timed_caption_generator import generate_timed_captions
 
-# Video keywords generator (manual + deep-translator)
+# Video keywords generator (manual + auto)
 from utility.video.video_search_query_generator import getVideoSearchQueriesTimed_manual as getVideoSearchQueriesTimed
 
 # Video generator
@@ -53,7 +52,7 @@ if st.button("Generate Video"):
         lang_code = detect(script_input)  # 'id' = Indonesian, 'en' = English
         voice = "id-ID-GadisNeural" if lang_code == "id" else "en-AU-WilliamNeural"
 
-        asyncio.run(generate_audio(script_input, temp_audio_file, voice))
+        asyncio.run(generate_audio(script_input, temp_audio_file, auto_detect=True))
 
         # ---------------------------
         # Step 2: Generate Timed Captions
