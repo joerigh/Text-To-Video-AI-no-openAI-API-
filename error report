@@ -1,6 +1,18 @@
-ModuleNotFoundError: No module named 'openai'
+ModuleNotFoundError: No module named 'cgi'
 Traceback:
-File "C:\Users\digitalFORENSIK\Downloads\Compressed\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\app.py", line 6, in <module>
-    from utility.video.video_search_query_generator import getVideoSearchQueriesTimed, merge_empty_intervals
-File "C:\Users\digitalFORENSIK\Downloads\Compressed\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\video\video_search_query_generator.py", line 1, in <module>
-    from openai import OpenAI
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\app.py", line 9, in <module>
+    from googletrans import Translator
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\googletrans\__init__.py", line 6, in <module>
+    from googletrans.client import Translator
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\googletrans\client.py", line 12, in <module>
+    import httpx
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\__init__.py", line 2, in <module>
+    from ._api import delete, get, head, options, patch, post, put, request, stream
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_api.py", line 3, in <module>
+    from ._client import Client, StreamContextManager
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_client.py", line 8, in <module>
+    from ._auth import Auth, BasicAuth, FunctionAuth
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_auth.py", line 10, in <module>
+    from ._models import Request, Response
+File "C:\Users\digitalFORENSIK\AppData\Local\Programs\Python\Python313\Lib\site-packages\httpx\_models.py", line 1, in <module>
+    import cgi
