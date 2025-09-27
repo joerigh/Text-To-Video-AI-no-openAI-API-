@@ -1,55 +1,87 @@
 import asyncio
-from utility.audio.audio_generator import generate_audio
-from utility.captions.timed_captions_generator import generate_timed_captions
-from utility.video.background_video_generator import generate_video_url
-from utility.render.render_engine import get_output_media
-from utility.video.video_search_query_generator import getVideoSearchQueriesTimed, merge_empty_intervals
-import argparse
+import edge_tts
+from moviepy.editor import TextClip, AudioFileClip, CompositeVideoClip, ColorClip
+from utility.captions.timed_captions_generator import (
+    text_to_captions,
+    generate_timed_captions
+)
 import os
 
-def read_script(file_path="naskah.txt"):
-    if os.path.exists(file_path):
-        with open(file_path, "r", encoding="utf-8") as f:
-            return f.read()
-    else:
-        return input("Masukkan naskah video secara manual: ")
+# -------------------------
+# Konfigurasi dasar
+AUDIO_FILE = "output/audio_tts.wav"
+VIDEO_FILE = "output/final_video.mp4"
+CAPTIONS_FILE = "output/captions.srt"
+TEXT_FILE = "naskah.txt"
 
+os.makedirs("output", exist_ok=True)
+
+# -------------------------
+# Fungsi buat audio TTS
+async def generate_audio_tts(text, file_path):
+    communicate = edge_tts.Communicate(text, "id-ID-ArdiNeural")
+    await communicate.save(file_path)
+
+# -------------------------
+# Fungsi render video
+def render_video(user_text, audio_path, video_path, step=2.0):
+    print("[INFO] Membuat audio clip...")
+    audio_clip = AudioFileClip(audio_path)
+    audio_duration = audio_clip.duration
+
+    # Background polos hitam
+    video_clip = ColorClip(size=(1280, 720), color=(0, 0, 0), duration=audio_duration)
+
+    print("[INFO] Membuat captions...")
+    captions = text_to_captions(user_text, step=step)
+    timed_captions = generate_timed_captions(captions)
+
+    # Simpan ke file .srt
+    with open(CAPTIONS_FILE, "w", encoding="utf-8") as f:
+        for i, cap in enumerate(captions, start=1):
+            f.write(f"{i}\n")
+            f.write(f"{cap['start']:.2f} --> {cap['end']:.2f}\n")
+            f.write(f"{cap['text']}\n\n")
+
+    print(f"[INFO] Captions disimpan ke {CAPTIONS_FILE}")
+
+    # Subtitle di-render ke video
+    subtitle_clips = []
+    for cap in captions:
+        txt_clip = (TextClip(cap["text"], fontsize=40, color="white", size=(1200, None), method="caption")
+                    .set_position(("center", "bottom"))
+                    .set_start(cap["start"])
+                    .set_end(cap["end"]))
+        subtitle_clips.append(txt_clip)
+
+    final = CompositeVideoClip([video_clip, *subtitle_clips]).set_audio(audio_clip)
+    final.write_videofile(video_path, fps=24, codec="libx264", audio_codec="aac")
+
+    return timed_captions
+
+# -------------------------
+# MAIN PROGRAM
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate a video from a script.")
-    parser.add_argument("--file", type=str, default="naskah.txt", help="Path to script file")
-    args = parser.parse_args()
+    print("🎬 Easy-Text-To-Video-AI (Terminal Version)")
 
-    SAMPLE_FILE_NAME = "audio_tts.wav"
-    VIDEO_SERVER = "pexel"
-
-    # Baca naskah
-    script_text = read_script(args.file)
-    print("Naskah video: \n", script_text)
-
-    # Generate audio TTS
-    asyncio.run(generate_audio(script_text, SAMPLE_FILE_NAME))
-
-    # Generate timed captions
-    timed_captions = generate_timed_captions(SAMPLE_FILE_NAME)
-    print("Timed captions: ", timed_captions)
-
-    # Generate video search queries
-    search_terms = getVideoSearchQueriesTimed(script_text, timed_captions)
-    print("Search terms: ", search_terms)
-
-    # Generate background video
-    background_video_urls = None
-    if search_terms:
-        background_video_urls = generate_video_url(search_terms, VIDEO_SERVER)
-        print("Background video URLs: ", background_video_urls)
+    # Cek apakah ada file naskah.txt
+    if os.path.exists(TEXT_FILE):
+        with open(TEXT_FILE, "r", encoding="utf-8") as f:
+            user_text = f.read().strip()
+        print(f"[INFO] Menggunakan teks dari {TEXT_FILE}")
     else:
-        print("No background video")
+        user_text = input("Masukkan naskah video: ").strip()
 
-    background_video_urls = merge_empty_intervals(background_video_urls)
+    if not user_text:
+        print("[ERROR] Naskah kosong. Keluar.")
+        exit(1)
 
-    # Render final video
-    if background_video_urls:
-        final_video = get_output_media(SAMPLE_FILE_NAME, timed_captions, background_video_urls, VIDEO_SERVER)
-        print("Video berhasil dibuat: ", final_video)
-    else:
-        print("Tidak ada video yang dibuat")
+    print("[INFO] Membuat audio TTS...")
+    asyncio.run(generate_audio_tts(user_text, AUDIO_FILE))
+    print(f"[SUCCESS] Audio berhasil dibuat: {AUDIO_FILE}")
+
+    print("[INFO] Membuat video...")
+    captions_text = render_video(user_text, AUDIO_FILE, VIDEO_FILE, step=2.0)
+
+    print(f"[SUCCESS] Video berhasil dibuat: {VIDEO_FILE}")
+    print(f"[INFO] Captions:\n{captions_text}")
