@@ -1,56 +1,42 @@
-import os
 import streamlit as st
-from utility.audio.audio_generator import generate_audio
-from utility.captions.whisper_caption import generate_timed_captions
+from main import VIDEO_OUTPUT, AUDIO_FILE, VIDEO_FOLDER, timed_captions
 from utility.video.video_search import getVideoSearchQueriesTimed, download_video_from_pexels
 from utility.video.video_merge import get_output_media
-from PIL import Image
+from utility.audio.text_to_speech import generate_tts
+import os
 
-# Patch untuk Pillow terbaru agar TextClip resize tidak error
-from moviepy.editor import TextClip
-TextClip._resize_resampling_method = Image.Resampling.LANCZOS
+st.title("Easy Text to Video AI")
 
-st.title("Easy Text-To-Video AI")
+text_input = st.text_area("Masukkan naskah video:", height=150)
 
-user_text = st.text_area("Masukkan teks / naskah video:", height=150)
-
-if st.button("Generate Video"):
-    if not user_text.strip():
+if st.button("Buat Video"):
+    if not text_input.strip():
         st.warning("Teks kosong!")
     else:
-        AUDIO_FILE = "audio_tts.wav"
-        if not os.path.exists(AUDIO_FILE):
-            st.info("Membuat audio baru...")
-        generate_audio(user_text, AUDIO_FILE)
+        # Simpan timed captions sementara, bisa disederhanakan
+        captions = [(i*5, line.strip()) for i, line in enumerate(text_input.split('\n')) if line.strip()]
 
-        st.info("Membuat timed captions...")
-        timed_captions = generate_timed_captions(AUDIO_FILE)
+        # Generate TTS
+        AUDIO_FILE_PATH = "output/tts.wav"
+        if not os.path.exists(AUDIO_FILE_PATH):
+            generate_tts(captions, AUDIO_FILE_PATH)
 
-        st.info("Mengambil video dari Pexels...")
-        search_queries = getVideoSearchQueriesTimed(timed_captions)
+        # Query panjang
+        queries = getVideoSearchQueriesTimed(captions, max_words=10)
         video_files = []
-        for idx, q in enumerate(search_queries):
-            vf = download_video_from_pexels(q, idx)
-            if vf:
-                video_files.append(vf)
-
-        st.write("Video berhasil diambil:")
-        for vf in video_files:
-            st.write(vf, os.path.exists(vf))
-
-        # Fallback
-        if not video_files:
-            fallback_path = "output/fallback.mp4"
-            if os.path.exists(fallback_path):
-                st.info("Menggunakan video fallback")
-                video_files.append(fallback_path)
+        for idx, query in enumerate(queries):
+            output_path = os.path.join(VIDEO_FOLDER, f"video_{idx}.mp4")
+            if os.path.exists(output_path):
+                video_files.append(output_path)
             else:
-                st.error("Tidak ada video tersedia. Hentikan proses")
-                st.stop()
+                vid = download_video_from_pexels(query, idx=idx)
+                if vid:
+                    video_files.append(vid)
 
-        VIDEO_FILE = "final_video_streamlit.mp4"
-        st.info("Menggabungkan video + audio...")
-        get_output_media(AUDIO_FILE, video_files, VIDEO_FILE)
-
-        st.success(f"Video final tersimpan: {VIDEO_FILE}")
-        st.video(VIDEO_FILE)
+        if video_files:
+            st.info("Menggabungkan video + audio...")
+            get_output_media(AUDIO_FILE_PATH, video_files, VIDEO_OUTPUT)
+            st.success(f"Selesai! Video akhir ada di: {VIDEO_OUTPUT}")
+            st.video(VIDEO_OUTPUT)
+        else:
+            st.error("Tidak ada video yang berhasil didownload.")
