@@ -1,4 +1,6 @@
-SyntaxError: File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\utility\video\video_search.py", line 2 import os import requests from deep_translator import GoogleTranslator ^ SyntaxError: invalid syntax
+ModuleNotFoundError: No module named 'utility.audio.text_to_speech'
 Traceback:
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 6, in <module>
-    from utility.video.video_search import getVideoSearchQueriesTimed, download_video_from_pexels
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 3, in <module>
+    from main import VIDEO_OUTPUT, AUDIO_FILE, VIDEO_FOLDER, timed_captions
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\main.py", line 5, in <module>
+    from utility.audio.text_to_speech import generate_tts
