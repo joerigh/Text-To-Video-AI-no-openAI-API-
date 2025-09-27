@@ -7,6 +7,17 @@ from utility.captions.timed_captions_generator import (
     generate_timed_captions
 )
 import os
+import os
+from moviepy.config import change_settings
+
+# Patch otomatis untuk ImageMagick di Windows
+default_magick = r"C:\Program Files\ImageMagick-7.1.1-Q16-HDRI\magick.exe"
+if os.path.exists(default_magick):
+    change_settings({"IMAGEMAGICK_BINARY": default_magick})
+    print(f"[INFO] ImageMagick path di-set ke: {default_magick}")
+else:
+    print("[WARNING] ImageMagick tidak ditemukan di path default.")
+    print("Silakan install ImageMagick atau set path manual.")
 
 # -------------------------
 # Konfigurasi dasar
