@@ -1,115 +1,66 @@
+# app.py
 import streamlit as st
-import asyncio
-from utility.script.script_generator import generate_script_manual
-from utility.video.video_searc_query_generator import getVideoSearchQueriesTimed_manual
 from utility.audio.audio_generator import generate_audio
 from utility.captions.timed_caption_generator import generate_timed_captions
+from utility.video.video_search_query_generator import getVideoSearchQueriesTimed_manual as getVideoSearchQueriesTimed
 from utility.video.background_video_generator import generate_video_url
 from utility.render.render_engine import get_output_media
-from deep_translator import GoogleTranslator
-from langdetect import detect
-import re
+import asyncio
+import tempfile
 
-# -------------------
-# Helpers
-# -------------------
-translator = Translator()
+st.set_page_config(page_title="Easy Text-To-Video AI", layout="wide")
 
-def translate_to_english(word):
-    try:
-        return GoogleTranslator(source='auto', target='en').translate(word)
-    except:
-        return word
+st.title("🎬 Easy Text-To-Video AI")
 
-def extract_keywords_from_script(script, top_n=10):
-    words = re.findall(r'\b\w+\b', script.lower())
-    stopwords = set(["the","and","is","are","a","of","to","in","for","with","that","on","as","by","at"])
-    words = [w for w in words if w not in stopwords]
-    counts = {}
-    for w in words:
-        counts[w] = counts.get(w,0)+1
-    keywords = sorted(counts, key=counts.get, reverse=True)[:top_n]
-    return keywords
+# ---------------------------
+# Input Section
+# ---------------------------
+script_input = st.text_area("Input your video script:", height=200)
+st.markdown("Optional: You can add manual keywords per caption segment (comma-separated)")
+manual_keywords_input = st.text_area("Manual keywords (one line per caption segment, optional):", height=150)
 
-def translate_keywords_to_english(keywords):
-    translated = []
-    for kw in keywords:
-        try:
-            trans = translator.translate(kw, src='auto', dest='en').text
-            translated.append(trans)
-        except:
-            translated.append(kw)
-    return translated
-
-def detect_language(text):
-    try:
-        return detect(text)
-    except:
-        return "en"
-
-# -------------------
-# Streamlit UI
-# -------------------
-st.title("Easy Text-to-Video AI (Manual + Auto Keyword)")
-
-# Input Script
-script_text = st.text_area("Masukkan script video (ID/EN):", height=150)
-
-# Option to auto extract keywords
-auto_keyword = st.checkbox("Auto extract keywords dari script?", value=True)
-
-# Input manual keywords
-keywords_input = st.text_area("Masukkan keywords (opsional, pisah koma/baris per segment):", height=150)
+video_server = st.selectbox("Video source:", ["pexel"])
 
 if st.button("Generate Video"):
-    if not script_text:
-        st.error("Script harus diisi!")
+    if not script_input.strip():
+        st.warning("Please enter a script first!")
     else:
-        # -------------------
-        # 1. Generate Script (manual)
-        # -------------------
-        script_dict = generate_script_manual(script_text)
-        script = script_dict["script"]
+        # Prepare manual keywords
+        manual_keywords = []
+        if manual_keywords_input.strip():
+            lines = manual_keywords_input.strip().split("\n")
+            for line in lines:
+                kws = [kw.strip() for kw in line.split(",") if kw.strip()]
+                manual_keywords.append(kws)
+        # ---------------------------
+        # Step 1: Generate Audio
+        # ---------------------------
+        st.info("🔊 Generating audio...")
+        temp_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3").name
+        asyncio.run(generate_audio(script_input, temp_audio_file))
+        
+        # ---------------------------
+        # Step 2: Generate Timed Captions
+        # ---------------------------
+        st.info("📝 Generating timed captions...")
+        timed_captions = generate_timed_captions(temp_audio_file)
 
-        # -------------------
-        # 2. Detect language for TTS
-        # -------------------
-        lang = detect_language(script)
-        tts_voice = "id-ID-GadisNeural" if lang == "id" else "en-AU-WilliamNeural"
+        # ---------------------------
+        # Step 3: Generate Video Keywords (manual/auto)
+        # ---------------------------
+        st.info("🔑 Generating keywords for video search...")
+        timed_keywords = getVideoSearchQueriesTimed(script_input, timed_captions, manual_keywords)
 
-        # -------------------
-        # 3. Generate TTS Audio
-        # -------------------
-        audio_file = "audio.mp3"
-        asyncio.run(generate_audio(script, audio_file, voice=tts_voice))
+        # ---------------------------
+        # Step 4: Download Background Videos
+        # ---------------------------
+        st.info("🎥 Downloading background videos...")
+        timed_video_urls = generate_video_url(timed_keywords, video_server=video_server)
 
-        # -------------------
-        # 4. Generate Timed Captions
-        # -------------------
-        captions_timed = generate_timed_captions(audio_file)
-
-        # -------------------
-        # 5. Prepare keywords
-        # -------------------
-        if auto_keyword:
-            manual_keywords = [translate_keywords_to_english(extract_keywords_from_script(c[1])) for c in captions_timed]
-        elif keywords_input:
-            # parse input manual
-            manual_keywords = [ [kw.strip() for kw in k.split(",")] for k in keywords_input.strip().split("\n")]
-        else:
-            st.error("Masukkan keywords atau centang auto extract")
-            st.stop()
-
-        # -------------------
-        # 6. Generate Video URLs via Pexels
-        # -------------------
-        video_server = "pexel"
-        timed_video_urls = generate_video_url(list(zip([c[0] for c in captions_timed], manual_keywords)), video_server)
-
-        # -------------------
-        # 7. Render Final Video
-        # -------------------
-        output_video = get_output_media(audio_file, captions_timed, timed_video_urls, video_server)
-
-        st.success(f"Video berhasil dibuat: {output_video}")
-        st.video(output_video)
+        # ---------------------------
+        # Step 5: Render Final Video
+        # ---------------------------
+        st.info("🖥️ Rendering final video...")
+        output_file = get_output_media(temp_audio_file, timed_captions, timed_video_urls, video_server=video_server)
+        st.success(f"✅ Video generated: {output_file}")
+        st.video(output_file)
