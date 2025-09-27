@@ -1,43 +1,41 @@
-import requests
-import os
+from moviepy.editor import VideoFileClip, concatenate_videoclips, AudioFileClip, TextClip, CompositeVideoClip
 
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
-PEXELS_URL = "https://api.pexels.com/videos/search"
-
-HEADERS = {"Authorization": PEXELS_API_KEY}
-
-def getVideoSearchQueriesTimed(script, timed_captions):
+def get_output_media(audio_file, captions, video_segments, provider="pexels", output="final_video.mp4"):
     """
-    Ambil query pencarian video dari caption.
-    Format return: [(start, end, text), ...]
+    Merge audio, video, dan captions jadi output final.
+    video_segments = [(start, end, video_url), ...]
+    captions = [((start, end), text), ...]
     """
-    queries = []
-    for (start, end), text in timed_captions:
-        cleaned = text.strip()
-        if cleaned:
-            queries.append((start, end, cleaned))
-    return queries
 
+    clips = []
+    for (start, end, url) in video_segments:
+        if url:
+            try:
+                clip = VideoFileClip(url).subclip(0, end - start)
+                clips.append(clip)
+            except Exception as e:
+                print(f"[WARN] Gagal load video {url}: {e}")
 
-def generate_video_url(search_terms, provider="pexels"):
-    """
-    Cari video di Pexels sesuai query.
-    search_terms = [(start, end, text), ...]
-    Return: [(start, end, best_video_url), ...]
-    """
-    results = []
-    for (start, end, query) in search_terms:
-        params = {"query": query, "per_page": 1, "orientation": "landscape"}
-        resp = requests.get(PEXELS_URL, headers=HEADERS, params=params)
+    if not clips:
+        raise RuntimeError("Tidak ada video yang berhasil diambil.")
 
-        if resp.status_code == 200:
-            data = resp.json()
-            if data.get("videos"):
-                best_video = data["videos"][0]["video_files"][0]["link"]
-                results.append((start, end, best_video))
-            else:
-                results.append((start, end, None))
-        else:
-            results.append((start, end, None))
+    video = concatenate_videoclips(clips, method="compose")
 
-    return results
+    # Tambah captions
+    caption_clips = []
+    for (start, end), text in captions:
+        txt_clip = (TextClip(text, fontsize=40, color="white", method="caption", size=(video.w, None))
+                    .set_position(("center", "bottom"))
+                    .set_start(start)
+                    .set_duration(end - start))
+        caption_clips.append(txt_clip)
+
+    final = CompositeVideoClip([video, *caption_clips])
+
+    # Tambah audio
+    audio = AudioFileClip(audio_file)
+    final = final.set_audio(audio)
+
+    final.write_videofile(output, fps=24, codec="libx264", audio_codec="aac")
+
+    return output
