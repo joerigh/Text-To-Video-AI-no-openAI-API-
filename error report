@@ -1,4 +1,4 @@
-ModuleNotFoundError: No module named 'utility.video.video_merge'
+ModuleNotFoundError: No module named 'utility.audio.tts'
 Traceback:
-File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 7, in <module>
-    from utility.video.video_merge import get_output_media
+File "E:\Easy-Text-To-Video-AI-main\Easy-Text-To-Video-AI-main\streamlit_main.py", line 8, in <module>
+    from utility.audio.tts import generate_audio
