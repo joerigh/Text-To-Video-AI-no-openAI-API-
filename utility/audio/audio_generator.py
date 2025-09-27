@@ -1,6 +1,7 @@
 import edge_tts
 import asyncio
 
-async def generate_audio(script_text, output_file):
-    tts = edge_tts.Communicate(script_text, "id-ID-AriaNeural")
-    await tts.save(output_file)
+async def generate_audio(text, output_file="audio_tts.wav", voice="id-ID-ArdiNeural"):
+    communicate = edge_tts.Communicate(text, voice)
+    await communicate.save(output_file)
+    print(f"Audio berhasil dibuat: {output_file}")
