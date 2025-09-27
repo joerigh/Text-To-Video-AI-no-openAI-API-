@@ -1,23 +1,33 @@
 # app.py
 import streamlit as st
-from utility.audio.audio_generator import generate_audio
-from utility.captions.timed_caption_generator import generate_timed_captions
-from utility.video.video_search_query_generator import getVideoSearchQueriesTimed_manual as getVideoSearchQueriesTimed
-from utility.video.background_video_generator import generate_video_url
-from utility.render.render_engine import get_output_media
-import asyncio
 import tempfile
+import asyncio
+from langdetect import detect
+
+# Audio generator
+from utility.audio.audio_generator import generate_audio
+
+# Caption generator
+from utility.captions.timed_caption_generator import generate_timed_captions
+
+# Video keywords generator (manual + deep-translator)
+from utility.video.video_search_query_generator import getVideoSearchQueriesTimed_manual as getVideoSearchQueriesTimed
+
+# Video generator
+from utility.video.background_video_generator import generate_video_url
+
+# Render engine
+from utility.render.render_engine import get_output_media
 
 st.set_page_config(page_title="Easy Text-To-Video AI", layout="wide")
-
 st.title("🎬 Easy Text-To-Video AI")
 
 # ---------------------------
 # Input Section
 # ---------------------------
 script_input = st.text_area("Input your video script:", height=200)
-st.markdown("Optional: You can add manual keywords per caption segment (comma-separated)")
-manual_keywords_input = st.text_area("Manual keywords (one line per caption segment, optional):", height=150)
+st.markdown("Optional: Add manual keywords per caption segment (comma-separated, one line per segment).")
+manual_keywords_input = st.text_area("Manual keywords (optional):", height=150)
 
 video_server = st.selectbox("Video source:", ["pexel"])
 
@@ -32,13 +42,19 @@ if st.button("Generate Video"):
             for line in lines:
                 kws = [kw.strip() for kw in line.split(",") if kw.strip()]
                 manual_keywords.append(kws)
+
         # ---------------------------
         # Step 1: Generate Audio
         # ---------------------------
         st.info("🔊 Generating audio...")
         temp_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3").name
-        asyncio.run(generate_audio(script_input, temp_audio_file))
-        
+
+        # Auto detect bahasa script
+        lang_code = detect(script_input)  # 'id' = Indonesian, 'en' = English
+        voice = "id-ID-GadisNeural" if lang_code == "id" else "en-AU-WilliamNeural"
+
+        asyncio.run(generate_audio(script_input, temp_audio_file, voice))
+
         # ---------------------------
         # Step 2: Generate Timed Captions
         # ---------------------------
