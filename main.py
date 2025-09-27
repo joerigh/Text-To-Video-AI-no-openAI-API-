@@ -1,3 +1,4 @@
+import os
 from utility.audio.audio_generator import generate_audio
 from utility.captions.whisper_caption import generate_timed_captions
 from utility.video.video_search import getVideoSearchQueriesTimed, download_video_from_pexels
@@ -21,11 +22,23 @@ for idx, q in enumerate(search_queries):
     if vf:
         video_files.append(vf)
 
-if not video_files:
-    print("Tidak ada video berhasil diambil. Hentikan proses.")
-    exit(1)
+# Debug: print video files
+print("Video files berhasil diambil:")
+for vf in video_files:
+    exists = os.path.exists(vf)
+    print(vf, "->", exists)
 
-# ===== 4. Merge video + audio =====
+# ===== 4. Fallback jika kosong =====
+if not video_files:
+    fallback_path = "output/fallback.mp4"
+    if os.path.exists(fallback_path):
+        print("Menggunakan video fallback")
+        video_files.append(fallback_path)
+    else:
+        print("Tidak ada video tersedia, hentikan proses")
+        exit(1)
+
+# ===== 5. Merge video + audio =====
 VIDEO_FILE = "final_video.mp4"
 get_output_media(AUDIO_FILE, video_files, VIDEO_FILE)
 
