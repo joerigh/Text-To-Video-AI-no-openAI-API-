@@ -1,45 +1,40 @@
 import os
-from utility.audio.audio_generator import generate_audio
-from utility.captions.whisper_caption import generate_timed_captions
 from utility.video.video_search import getVideoSearchQueriesTimed, download_video_from_pexels
 from utility.video.video_merge import get_output_media
+from utility.audio.text_to_speech import generate_tts
 
-AUDIO_FILE = "audio_tts.wav"
-VIDEO_FILE = "final_video.mp4"
+VIDEO_OUTPUT = "output/final_video.mp4"
+AUDIO_FILE = "output/tts.wav"
+VIDEO_FOLDER = "output"
 
-# ===== Input teks / naskah =====
-naskah = input("Masukkan teks / naskah video: ")
+# Contoh timed captions: [(timestamp, caption)]
+timed_captions = [
+    (0, "Halo teman-teman, selamat datang di tutorial AI ini."),
+    (5, "Kita akan belajar bagaimana membuat video otomatis dari teks.")
+]
 
-# ===== 1. Generate audio baru jika file tts.wav tidak ada =====
+# Generate TTS jika belum ada
 if not os.path.exists(AUDIO_FILE):
-    print("Membuat audio baru...")
-generate_audio(naskah, AUDIO_FILE)
+    generate_tts(timed_captions, AUDIO_FILE)
 
-# ===== 2. Generate timed captions =====
-timed_captions = generate_timed_captions(AUDIO_FILE)
+# Buat query panjang dari captions
+queries = getVideoSearchQueriesTimed(timed_captions, max_words=10)
 
-# ===== 3. Generate query & download video =====
-search_queries = getVideoSearchQueriesTimed(timed_captions)
 video_files = []
-for idx, q in enumerate(search_queries):
-    vf = download_video_from_pexels(q, idx)
-    if vf:
-        video_files.append(vf)
-
-print("Video files berhasil diambil:")
-for vf in video_files:
-    print(vf, os.path.exists(vf))
-
-# ===== 4. Fallback jika kosong =====
-if not video_files:
-    fallback_path = "output/fallback.mp4"
-    if os.path.exists(fallback_path):
-        print("Menggunakan video fallback")
-        video_files.append(fallback_path)
+for idx, query in enumerate(queries):
+    output_path = os.path.join(VIDEO_FOLDER, f"video_{idx}.mp4")
+    if os.path.exists(output_path):
+        print(f"Video sudah ada: {output_path}")
+        video_files.append(output_path)
     else:
-        print("Tidak ada video tersedia, hentikan proses")
-        exit(1)
+        print(f"Mencari video untuk query: {query}")
+        vid = download_video_from_pexels(query, idx=idx)
+        if vid:
+            video_files.append(vid)
 
-# ===== 5. Merge video + audio =====
-get_output_media(AUDIO_FILE, video_files, VIDEO_FILE)
-print("Selesai! Video final tersimpan di:", VIDEO_FILE)
+if video_files:
+    print("Menggabungkan video + audio...")
+    get_output_media(AUDIO_FILE, video_files, VIDEO_OUTPUT)
+    print(f"Selesai! Video akhir ada di: {VIDEO_OUTPUT}")
+else:
+    print("Tidak ada video yang berhasil didownload.")
