@@ -1,70 +1,33 @@
-import os
-import requests
-from deep_translator import GoogleTranslator
-from dotenv import load_dotenv
+import os import requests from deep_translator import GoogleTranslator
 
-load_dotenv()
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
-PEXELS_VIDEO_URL = "https://api.pexels.com/videos/search"
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY") OUTPUT_FOLDER = "output"
 
-OUTPUT_FOLDER = "output"
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+if not os.path.exists(OUTPUT_FOLDER): os.makedirs(OUTPUT_FOLDER)
 
-def translate_to_en(text):
-    try:
-        return GoogleTranslator(source='auto', target='en').translate(text)
-    except Exception as e:
-        print("Translation failed:", e)
-        return text
+def getVideoSearchQueriesTimed(timed_captions, max_words=5): """ Mengubah timed captions menjadi query video untuk Pexels. Ambil 3-5 kata pertama tiap caption, translate ke Inggris. """ queries = [] for _, caption in timed_captions: words = caption.split()[:max_words] query = " ".join(words) query_en = GoogleTranslator(source='auto', target='en').translate(query) queries.append(query_en) return queries
 
-def getVideoSearchQueriesTimed(timed_captions):
-    queries = []
-    for (start, end), text in timed_captions:
-        text = text.strip()
-        if text:
-            text_en = translate_to_en(text)
-            queries.append(text_en)
-    return queries
+def download_video_from_pexels(query, idx=0, output_folder=OUTPUT_FOLDER): """ Download video dari Pexels API sesuai query. """ headers = { "Authorization": PEXELS_API_KEY } params = { "query": query, "per_page": 1, "orientation": "landscape" } url = "https://api.pexels.com/videos/search"
 
-def download_video_from_pexels(query, idx=0):
-    headers = {"Authorization": PEXELS_API_KEY, "User-Agent": "Mozilla/5.0"}
-    params = {"query": query, "per_page": 1, "orientation": "landscape"}
+try:
+    response = requests.get(url, headers=headers, params=params, timeout=10)
+    response.raise_for_status()
+    data = response.json()
+    if data['videos']:
+        video_url = data['videos'][0]['video_files'][0]['link']
+        output_path = os.path.join(output_folder, f"video_{idx}.mp4")
 
-    try:
-        response = requests.get(PEXELS_VIDEO_URL, headers=headers, params=params, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        videos = data.get("videos", [])
-        if not videos:
-            print(f"Tidak ada video untuk query '{query}'")
-            return None
-
-        # pilih resolusi hd atau sd
-        video_files = videos[0].get("video_files", [])
-        video_url = None
-        for vf in video_files:
-            if vf.get("quality") in ["hd", "sd"]:
-                video_url = vf.get("link")
-                break
-        if not video_url:
-            print(f"Tidak ada file video valid untuk query '{query}'")
-            return None
-
-        # download video ke folder output
-        local_file = os.path.join(OUTPUT_FOLDER, f"{idx}_{query.replace(' ','_')}.mp4")
-        r = requests.get(video_url, headers=headers, stream=True)
-        size = int(r.headers.get("content-length", 0))
-        if size == 0:
-            print(f"Video kosong untuk query '{query}'")
-            return None
-
-        with open(local_file, "wb") as f:
+        # Download video
+        r = requests.get(video_url, stream=True)
+        with open(output_path, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
-                f.write(chunk)
-
-        print(f"Video '{query}' tersimpan di {local_file} ({size/1024:.2f} KB)")
-        return local_file
-
-    except Exception as e:
-        print(f"Gagal ambil video '{query}': {e}")
+                if chunk:
+                    f.write(chunk)
+        return output_path
+    else:
+        print(f"Tidak ada video ditemukan untuk query: {query}")
         return None
+
+except Exception as e:
+    print(f"Error saat download video untuk query '{query}': {e}")
+    return None
+
