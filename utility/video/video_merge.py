@@ -1,48 +1,43 @@
+import requests
 import os
-from moviepy.editor import VideoFileClip, concatenate_videoclips, AudioFileClip, TextClip, CompositeVideoClip
 
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
+PEXELS_URL = "https://api.pexels.com/videos/search"
 
-def get_output_media(audio_file, timed_captions, video_files, provider="pexel", output_file="final_output.mp4"):
+HEADERS = {"Authorization": PEXELS_API_KEY}
+
+def getVideoSearchQueriesTimed(script, timed_captions):
     """
-    Merge background videos + audio + timed captions menjadi 1 video final.
+    Ambil query pencarian video dari caption.
+    Format return: [(start, end, text), ...]
     """
-    valid_clips = []
-
-    # cek video hasil download
-    for vf in video_files:
-        if not os.path.exists(vf):
-            print(f"⚠️ Skip, file tidak ditemukan: {vf}")
-            continue
-        try:
-            clip = VideoFileClip(vf).resize(height=720)
-            valid_clips.append(clip)
-        except Exception as e:
-            print(f"⚠️ Skip video {vf}, error: {e}")
-
-    if not valid_clips:
-        raise RuntimeError("❌ Tidak ada video valid untuk digabung.")
-
-    # gabung semua background video
-    background = concatenate_videoclips(valid_clips, method="compose")
-
-    # load audio
-    audio = AudioFileClip(audio_file)
-    background = background.set_audio(audio)
-
-    # tambahkan caption
-    caption_clips = []
+    queries = []
     for (start, end), text in timed_captions:
-        txt_clip = (TextClip(text, fontsize=40, color="white", size=(1200, None), method="caption")
-                    .set_start(start)
-                    .set_end(end)
-                    .set_position(("center", "bottom")))
-        caption_clips.append(txt_clip)
+        cleaned = text.strip()
+        if cleaned:
+            queries.append((start, end, cleaned))
+    return queries
 
-    final = CompositeVideoClip([background] + caption_clips)
 
-    # set durasi sesuai audio (biar sinkron)
-    final = final.set_duration(audio.duration)
+def generate_video_url(search_terms, provider="pexels"):
+    """
+    Cari video di Pexels sesuai query.
+    search_terms = [(start, end, text), ...]
+    Return: [(start, end, best_video_url), ...]
+    """
+    results = []
+    for (start, end, query) in search_terms:
+        params = {"query": query, "per_page": 1, "orientation": "landscape"}
+        resp = requests.get(PEXELS_URL, headers=HEADERS, params=params)
 
-    final.write_videofile(output_file, fps=24)
+        if resp.status_code == 200:
+            data = resp.json()
+            if data.get("videos"):
+                best_video = data["videos"][0]["video_files"][0]["link"]
+                results.append((start, end, best_video))
+            else:
+                results.append((start, end, None))
+        else:
+            results.append((start, end, None))
 
-    return "Video berhasil dibuat."
+    return results
