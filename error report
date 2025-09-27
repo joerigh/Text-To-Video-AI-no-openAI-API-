@@ -7,4 +7,7 @@ Weird facts you probably didn't know:
 - The shortest war in history was between Britain and Zanzibar on August 27, 1896. Zanzibar surrendered after 38 minutes.
 - Octopuses have three hearts and blue blood.
 
-{"query": "10", "response": {"status": 401, "code": "Unauthorized"}, "timestamp": "2025-09-27T21:50:39.415445"}
+import os, requests
+PEXELS_API_KEY = os.environ.get('PEXELS_KEY')
+r = requests.get("https://api.pexels.com/videos/popular", headers={"Authorization": PEXELS_API_KEY})
+print(r.status_code, r.json())
