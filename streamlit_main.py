@@ -4,6 +4,11 @@ from utility.audio.audio_generator import generate_audio
 from utility.captions.whisper_caption import generate_timed_captions
 from utility.video.video_search import getVideoSearchQueriesTimed, download_video_from_pexels
 from utility.video.video_merge import get_output_media
+from PIL import Image
+
+# Patch untuk Pillow terbaru agar TextClip resize tidak error
+from moviepy.editor import TextClip
+TextClip._resize_resampling_method = Image.Resampling.LANCZOS
 
 st.title("Easy Text-To-Video AI")
 
@@ -13,8 +18,9 @@ if st.button("Generate Video"):
     if not user_text.strip():
         st.warning("Teks kosong!")
     else:
-        st.info("Membuat audio...")
         AUDIO_FILE = "audio_tts.wav"
+        if not os.path.exists(AUDIO_FILE):
+            st.info("Membuat audio baru...")
         generate_audio(user_text, AUDIO_FILE)
 
         st.info("Membuat timed captions...")
@@ -28,12 +34,11 @@ if st.button("Generate Video"):
             if vf:
                 video_files.append(vf)
 
-        # Debug print
         st.write("Video berhasil diambil:")
         for vf in video_files:
             st.write(vf, os.path.exists(vf))
 
-        # Fallback jika kosong
+        # Fallback
         if not video_files:
             fallback_path = "output/fallback.mp4"
             if os.path.exists(fallback_path):
@@ -43,8 +48,8 @@ if st.button("Generate Video"):
                 st.error("Tidak ada video tersedia. Hentikan proses")
                 st.stop()
 
-        st.info("Menggabungkan video + audio...")
         VIDEO_FILE = "final_video_streamlit.mp4"
+        st.info("Menggabungkan video + audio...")
         get_output_media(AUDIO_FILE, video_files, VIDEO_FILE)
 
         st.success(f"Video final tersimpan: {VIDEO_FILE}")
