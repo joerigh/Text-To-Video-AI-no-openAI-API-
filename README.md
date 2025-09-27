@@ -1,128 +1,116 @@
-Text-To-Video AI
+# Easy-Text-To-Video-AI 🎬✨  
 
-
----
-
-Tanpa OpenAI API
-
-Naskah dibuat sendiri tanpa otomatis oleh openAI
-
-Bisa dijalankan via Terminal atau Streamlit GUI
-
-
+**Easy-Text-To-Video-AI** adalah project sederhana yang mengubah teks menjadi video otomatis dengan dukungan:  
+- 🎙️ **Text-to-Speech (TTS)** → mengubah naskah jadi suara  
+- 📝 **Timed Caption Generator** → membuat subtitle otomatis dengan timestamp  
+- 🎥 **MoviePy + FFmpeg** → merangkai audio, teks, dan gambar jadi video  
+- 🤖 **OpenAI API** (opsional) → bisa dipakai untuk auto naskah / perbaikan teks  
 
 ---
 
-🔹 Fitur Utama
-
-Input naskah manual atau dari file .txt
-
-Generate audio TTS dari naskah
-
-Generate timed captions otomatis
-
-Cari dan gunakan background video dari Pexels
-
-Render video final (rendered_video.mp4) di lokal
-
-
+## 📂 Struktur Project
+```
+Easy-Text-To-Video-AI/
+│── main.py
+│── requirements.txt
+│── .env
+│── utils/
+│   ├── __init__.py
+│   ├── timed_caption_generator.py   # modul subtitle otomatis ✅
+│   └── (utility lainnya)
+```
 
 ---
 
-💻 Instalasi
+## ⚙️ Instalasi
 
-1. Clone repositori:
+1. **Clone repository**  
+   ```bash
+   git clone https://github.com/username/Easy-Text-To-Video-AI.git
+   cd Easy-Text-To-Video-AI
+   ```
 
+2. **Buat environment (opsional tapi direkomendasikan)**  
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # Linux/Mac
+   venv\Scripts\activate      # Windows
+   ```
 
+3. **Install dependencies**  
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-git clone <repo-url>
-cd Text-To-Video-NoOpenAI
+4. **Install FFmpeg** (wajib)  
+   - **Windows**: download dari https://ffmpeg.org/download.html → tambahkan ke PATH  
+   - **Linux/Mac**:  
+     ```bash
+     sudo apt install ffmpeg   # Ubuntu/Debian
+     brew install ffmpeg       # Mac (Homebrew)
+     ```
 
-2. Install dependencies:
-
-
-
-pip install -r requirements.txt
-
-3. Install ImageMagick agar TextClip MoviePy berjalan:
-
-
-
-Linux: sudo apt install imagemagick
-
-Windows: download installer ImageMagick
-
-
+5. **Buat file `.env`** (untuk API key OpenAI / TTS)  
+   ```
+   OPENAI_API_KEY=sk-xxxxxxxx
+   ```
 
 ---
 
-🚀 Cara Pakai
+## 🚀 Cara Menjalankan
 
-1. Terminal / Command Line
-
+### 1. Jalankan script utama
+```bash
 python main.py
+```
 
-Pilih input naskah: file naskah.txt atau manual
+### 2. Input naskah
+- Bisa ketik langsung di terminal / UI (jika pakai Streamlit).  
+- Atau buat file `naskah.txt` lalu load di `main.py`.
 
-Video final akan tersimpan sebagai rendered_video.mp4
-
-
-2. Streamlit GUI
-
-streamlit run main_streamlit.py
-
-Masukkan naskah di text area
-
-Klik Generate Video
-
-Video final akan muncul langsung di browser
-
-
+### 3. Hasil
+- File video otomatis tersimpan di folder `output/` dengan audio + subtitle.
 
 ---
 
-⚙️ Konfigurasi
+## 📝 Fitur Timed Caption Generator
 
-Pexels API Key: masukkan di main.py
+Di `utils/timed_caption_generator.py` tersedia fungsi untuk membuat subtitle otomatis dengan timestamp.
 
+### Contoh penggunaan:
+```python
+from utils.timed_caption_generator import generate_timed_captions
 
-PEXELS_API_KEY = "YOUR_PEXELS_API_KEY"
+captions = [
+    {"start": 0.0, "end": 2.0, "text": "Halo dunia"},
+    {"start": 2.1, "end": 4.0, "text": "Ini teks kedua"},
+]
 
-File naskah opsional: naskah.txt
+timed_text = generate_timed_captions(captions)
+print(timed_text)
+```
 
-
-
----
-
-📂 Struktur Folder
-
-Text-To-Video-NoOpenAI/
-├── main.py
-├── main_streamlit.py
-├── naskah.txt
-├── requirements.txt
-└── utility/
-    ├── audio/
-    │   └── audio_generator.py
-    ├── captions/
-    │   └── timed_captions_generator.py
-    ├── video/
-    │   ├── background_video_generator.py
-    │   └── video_search_query_generator.py
-    └── render/
-        └── render_engine.py
-
+### Output:
+```
+[0.00 - 2.00] Halo dunia
+[2.10 - 4.00] Ini teks kedua
+```
 
 ---
 
-⚠️ Catatan
-
-Semua rendering terjadi di lokal
-
-Background video diambil dari Pexels
-
-Tidak ada OpenAI API, semua naskah bisa input manual
-
-
+## 📌 Catatan
+- Pastikan **FFmpeg** sudah bisa dipanggil dari terminal (`ffmpeg -version`).  
+- Kalau error `AttributeError: 'dict' object has no attribute 'start'`, sekarang sudah fix: modul akan otomatis mengubah dict jadi object.  
 
 ---
+
+## 👨‍💻 Kontribusi
+Pull Request terbuka untuk fitur baru seperti:  
+- Support video background otomatis  
+- Auto translate subtitle  
+- Export subtitle ke `.srt`
+
+---
+
+## 📜 Lisensi
+MIT License © 2025  
