@@ -1,7 +1,7 @@
 import tempfile
 import os
 import subprocess
-from moviepy.editor import AudioFileClip, CompositeVideoClip, CompositeAudioClip, VideoFileClip, TextClip
+from moviepy import AudioFileClip, CompositeVideoClip, CompositeAudioClip, VideoFileClip, TextClip
 
 def get_program_path(program_name):
     try:
