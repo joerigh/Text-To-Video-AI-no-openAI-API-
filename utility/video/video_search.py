@@ -13,10 +13,6 @@ def translate_to_en(text):
         return text
 
 def getVideoSearchQueriesTimed(timed_captions):
-    """
-    Convert captions -> list of query strings (translated to English)
-    timed_captions = [((start,end), text), ...]
-    """
     queries = []
     for (start, end), text in timed_captions:
         text = text.strip()
@@ -26,11 +22,8 @@ def getVideoSearchQueriesTimed(timed_captions):
     return queries
 
 def generate_video_url(query, provider="pexels", per_page=1):
-    """
-    Ambil video URL dari Pexels API sesuai query
-    """
     if provider != "pexels":
-        raise ValueError("Only Pexels provider is supported now.")
+        raise ValueError("Only Pexels provider is supported.")
 
     headers = {"Authorization": PEXELS_API_KEY}
     params = {"query": query, "per_page": per_page, "orientation": "landscape"}
@@ -48,5 +41,4 @@ def generate_video_url(query, provider="pexels", per_page=1):
         print(f"No video found for query: '{query}'")
         return None
 
-    # ambil video pertama
     return videos[0]["video_files"][0]["link"]
