@@ -1,75 +1,29 @@
-aiohttp==3.9.5
-aiosignal==1.3.1
-annotated-types==0.7.0
-anyio==4.4.0
-attrs==23.2.0
-certifi==2024.7.4
-charset-normalizer==3.3.2
-Cython==3.0.10
-decorator==4.4.2
-distro==1.9.0
-dtw-python==1.5.1
+# Core
+streamlit==1.30.0
+requests==2.32.3
+
+# Audio TTS
 edge-tts==6.1.12
-filelock==3.14.0
-frozenlist==1.4.1
-fsspec==2024.6.0
-h11==0.14.0
-httpcore==1.0.5
-httpx==0.27.0
-idna==3.7
+asyncio==3.4.3
+
+# Video
+moviepy==1.0.3
 imageio==2.34.1
 imageio-ffmpeg==0.5.1
-Jinja2==3.1.4
-llvmlite==0.42.0
-MarkupSafe==2.1.5
-more-itertools==10.2.0
-moviepy==1.0.3
-mpmath==1.3.0
-multidict==6.0.5
-networkx==3.3
-numba==0.59.1
-numpy==1.26.4
-openai==1.31.1
-openai-whisper==20231117
-pillow==10.3.0
-proglog==0.1.10
-pydantic==2.7.3
-pydantic_core==2.18.4
-regex==2024.5.15
-requests==2.32.3
-scipy==1.13.1
-sniffio==1.3.1
-sympy==1.12.1
-tiktoken==0.7.0
-torch==2.3.1
-tqdm==4.66.4
-typing_extensions==4.12.1
-urllib3==2.2.1
+
+# Whisper
 whisper-timestamped==1.15.4
-yarl==1.9.4
-groq==0.11.0
-# Text-to-Speech
-edge-tts==1.2.0          # Generate audio dari teks
+numpy==1.26.4
+scipy==1.13.1
 
-# Timed captions
-whisper-timestamped==1.0.4  # Membuat captions beserta timestamp dari audio
-torch>=2.0.0                 # Backend untuk whisper
-torchaudio>=2.0.2            # Audio processing untuk whisper
+# Utilities
+googletrans==4.0.0rc1
+langdetect==1.0.9
 
-# Download video & request API
-requests==2.31.0          # Untuk panggil API Pexels dan download video
-tqdm==4.66.1              # Optional: progress bar saat download video
+# Logging / data
+pydantic==2.7.3
+json5==0.9.14
+tqdm==4.66.4
 
-# Video rendering
-moviepy==2.0.0.dev10      # Render video akhir
-numpy==1.26.0             # Dibutuhkan MoviePy
-pillow==10.1.0            # Manipulasi gambar/video & TextClip
-
-# GUI (opsional)
-streamlit==1.25.0         # Jika ingin pakai Streamlit GUI
-
-# Catatan tambahan:
-# 1. ImageMagick harus terinstall di sistem untuk TextClip:
-#    - Linux: sudo apt install imagemagick
-#    - Windows: download installer ImageMagick
-# 2. Semua library lain bisa diinstall via: pip install -r requirements.txt
+# System utils
+platformdirs==3.10.0
