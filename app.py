@@ -6,7 +6,7 @@ from utility.audio.audio_generator import generate_audio
 from utility.captions.timed_caption_generator import generate_timed_captions
 from utility.video.background_video_generator import generate_video_url
 from utility.render.render_engine import get_output_media
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 from langdetect import detect
 import re
 
@@ -14,6 +14,12 @@ import re
 # Helpers
 # -------------------
 translator = Translator()
+
+def translate_to_english(word):
+    try:
+        return GoogleTranslator(source='auto', target='en').translate(word)
+    except:
+        return word
 
 def extract_keywords_from_script(script, top_n=10):
     words = re.findall(r'\b\w+\b', script.lower())
