@@ -1,13 +1,39 @@
+import os
 import requests
 
-def generate_video_url(search_terms, video_server, api_key=None):
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
+if not PEXELS_API_KEY:
+    raise ValueError("PEXELS_API_KEY belum diset. Silakan set environment variable atau buat file .env")
+
+def generate_video_url(search_terms, per_page=3):
+    """
+    Ambil video dari Pexels berdasarkan daftar kata kunci (search_terms)
+    """
     video_urls = []
-    headers = {"Authorization": api_key} if api_key else {}
+
+    headers = {"Authorization": PEXELS_API_KEY}
+
     for term in search_terms:
-        if video_server.lower() == "pexel":
-            response = requests.get(f"https://api.pexels.com/videos/search?query={term}&per_page=1", headers=headers)
-            if response.status_code == 200:
-                data = response.json()
-                if data["videos"]:
-                    video_urls.append(((0, 5), data["videos"][0]["video_files"][0]["link"]))
+        url = f"https://api.pexels.com/videos/search?query={term}&per_page={per_page}"
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            data = response.json()
+            for video in data.get("videos", []):
+                # ambil video file resolusi tertinggi
+                video_file = max(video["video_files"], key=lambda x: x.get("width", 0))
+                video_urls.append(video_file["link"])
+        else:
+            print(f"Gagal ambil video untuk '{term}', status code: {response.status_code}")
+
+    if not video_urls:
+        print("Tidak ada video yang ditemukan di Pexels.")
+        return None
+
+    return video_urls
+
+def merge_empty_intervals(video_urls):
+    """
+    Stub sederhana: langsung return input
+    """
     return video_urls
