@@ -1,65 +1,79 @@
-# utils/timed_caption_generator.py
+import re
+from whisper_timestamped import load_model, transcribe_timestamped
 
-class Caption:
-    def __init__(self, start, end, text):
-        self.start = start
-        self.end = end
-        self.text = text
+def generate_timed_captions(audio_filename, model_size="base"):
+    # Load model Whisper
+    WHISPER_MODEL = load_model(model_size)
 
+    # Transcribe audio dengan timestamp
+    gen = transcribe_timestamped(WHISPER_MODEL, audio_filename, verbose=False, fp16=False)
 
-def normalize_captions(captions):
-    """
-    Pastikan semua caption punya atribut .start, .end, .text
-    meskipun awalnya berbentuk dict.
-    """
-    normalized = []
-    for cap in captions:
-        if isinstance(cap, dict):  # kalau dict -> ubah ke object
-            normalized.append(Caption(
-                cap.get("start", 0.0),
-                cap.get("end", 0.0),
-                cap.get("text", "")
-            ))
-        else:  # kalau sudah object, langsung pakai
-            normalized.append(cap)
-    return normalized
+    # Ambil captions
+    captions_raw = getCaptionsWithTime(gen)
 
-
-def generate_timed_captions(captions):
-    """
-    Generate teks caption dengan timing.
-    captions bisa berupa list of dict atau list of Caption object.
-    """
-    captions = normalize_captions(captions)
-
-    output = []
-    for cap in captions:
-        line = f"[{cap.start:.2f} - {cap.end:.2f}] {cap.text}"
-        output.append(line)
-
-    return "\n".join(output)
-
-
-def text_to_captions(text: str, step: float = 2.0):
-    """
-    Ubah input teks mentah (string) menjadi list of dict caption.
-    step = durasi per baris (default 2 detik).
-    """
-    lines = text.split("\n")
+    # Convert ke dict biar kompatibel dengan pipeline
     captions = []
-    for i, line in enumerate(lines):
-        if line.strip():
-            captions.append({
-                "start": i * step,
-                "end": (i + 1) * step,
-                "text": line.strip()
-            })
+    for (start, end), text in captions_raw:
+        captions.append({
+            "start": float(start),
+            "end": float(end),
+            "text": text
+        })
+
     return captions
 
+def splitWordsBySize(words, maxCaptionSize):
+    halfCaptionSize = maxCaptionSize / 2
+    captions = []
+    while words:
+        caption = words[0]
+        words = words[1:]
+        while words and len(caption + ' ' + words[0]) <= maxCaptionSize:
+            caption += ' ' + words[0]
+            words = words[1:]
+            if len(caption) >= halfCaptionSize and words:
+                break
+        captions.append(caption)
+    return captions
 
-# -----------------------------
-# Tes mandiri
-if __name__ == "__main__":
-    sample_text = "Halo dunia\nIni teks kedua\nBaris ketiga"
-    caps = text_to_captions(sample_text, step=2.0)
-    print(generate_timed_captions(caps))
+def getTimestampMapping(whisper_analysis):
+    index = 0
+    locationToTimestamp = {}
+    for segment in whisper_analysis['segments']:
+        for word in segment['words']:
+            newIndex = index + len(word['text'])+1
+            locationToTimestamp[(index, newIndex)] = word['end']
+            index = newIndex
+    return locationToTimestamp
+
+def cleanWord(word):
+    return re.sub(r'[^\w\s\-_"\'\']', '', word)
+
+def interpolateTimeFromDict(word_position, d):
+    for key, value in d.items():
+        if key[0] <= word_position <= key[1]:
+            return value
+    return None
+
+def getCaptionsWithTime(whisper_analysis, maxCaptionSize=15, considerPunctuation=False):
+    wordLocationToTime = getTimestampMapping(whisper_analysis)
+    position = 0
+    start_time = 0
+    CaptionsPairs = []
+    text = whisper_analysis['text']
+    
+    if considerPunctuation:
+        sentences = re.split(r'(?<=[.!?]) +', text)
+        words = [word for sentence in sentences for word in splitWordsBySize(sentence.split(), maxCaptionSize)]
+    else:
+        words = text.split()
+        words = [cleanWord(word) for word in splitWordsBySize(words, maxCaptionSize)]
+    
+    for word in words:
+        position += len(word) + 1
+        end_time = interpolateTimeFromDict(position, wordLocationToTime)
+        if end_time and word:
+            CaptionsPairs.append(((start_time, end_time), word))
+            start_time = end_time
+
+    return CaptionsPairs
